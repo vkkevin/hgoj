@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/astaxie/beego"
 	"html/template"
 	// "reflect"
 	"sort"
@@ -493,15 +494,13 @@ func (this *ContestController) ContestRank() {
 
 	contestInfo, _ := models.QueryContestByConId(c)
 
-	// redisClient, _ := cache.NewCache("memory", `{"key":"hgoj","conn":"127.0.0.1:6379","dbNum":"2","":""}`)
+	rdHost := beego.AppConfig.String("rdhost")
+
 	client := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
+		Addr:     rdHost,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-
-	// pong, err := client.Ping().Result()
-	// fmt.Println(pong, err)
 
 	var proIds []ContestProblem
 	for i, v := range pros {
@@ -536,7 +535,7 @@ func (this *ContestController) ContestRank() {
 			v.Rank = k + 1
 		}
 		json_data, _ := json.Marshal(data)
-		_ = client.SetNX("contestrankdd"+cid, json_data, 10*time.Second).Err()
+		_ = client.SetNX("contestrankdd"+cid, json_data, 60*time.Second).Err()
 	}
 	res, _ := client.Get("contestrankdd"+cid).Result()
 	var conData []*ContestRank

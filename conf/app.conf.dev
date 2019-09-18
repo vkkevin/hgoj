@@ -6,3 +6,6 @@ dbport = 3306
 dbuser = root
 dbpassword = root
 dbname = hgoj
+rdhost = redis:6379
+rdpassword =
+rddb = 0
